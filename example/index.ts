@@ -13,7 +13,7 @@ const { colorize, printf, combine, timestamp } = format;
 
 const app = express();
 
-app.use(traceMiddleware)
+app.use(traceMiddleware);
 
 const logger = new LoggerService({
   type: LoggerType.WINSTON,
@@ -22,41 +22,50 @@ const logger = new LoggerService({
     transports: [
       new transports.Console({
         format: combine(
-          timestamp({
-            format: 'YYYY-MM-DDThh:mm:ss',
-          }),
+          timestamp({ format: 'YYYY-MM-DDThh:mm:ss' }),
           colorize({ all: true }),
-          printf((info) => `[${info.timestamp}] ${info.level}:${info.message}`),
+          printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`)
         ),
       }),
-      new transports.File({
-        filename: 'api.log',
-      }),
+      new transports.File({ filename: 'api.log' }),
     ],
     format: combine(
-      timestamp({
-        format: 'YYYY-MM-DDThh:mm:ss',
-      }),
-      printf((info) => `[${info.timestamp}] ${info.level}:${info.message}`),
+      timestamp({ format: 'YYYY-MM-DDThh:mm:ss' }),
+      printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`)
     ),
+    
   },
 });
 
 let count = 0;
 
+const logMemoryUsage = (message: string) => {
+  const memoryUsage = process.memoryUsage();
+  logger.info(message, {
+    rss: `${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB`,
+    heapTotal: `${(memoryUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
+    heapUsed: `${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
+    external: `${(memoryUsage.external / 1024 / 1024).toFixed(2)} MB`,
+  });
+};
+
 app.get('/', async (req, res) => {
   count++;
+  
+  logMemoryUsage('Before processing request');
 
-  const newTime = new Date().getTime();
+  const newTime = Date.now();
   logger.info('Inside app route');
 
-  await new Promise(res => setTimeout(res, 1500));
+  await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  logger.info('Inside app route after 5s', {
+  logger.info('Inside app route after delay', {
     count,
     [EXECUTION_LOG_START_TIME]: newTime,
     [EXECUTION_LOG_CALLER]: 'timer',
   });
+
+  logMemoryUsage('After processing request');
 
   res.send('Hi');
 });
@@ -64,18 +73,25 @@ app.get('/', async (req, res) => {
 app.post('/', async (req, res) => {
   count++;
 
-  const newTime = new Date().getTime();
+  logMemoryUsage('Before processing request');
+
+  const newTime = Date.now();
   logger.info('Inside app route');
 
-  await new Promise(res => setTimeout(res, 1500));
+  await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  logger.info('Inside app route after 5s', {
+  logger.info('Inside app route after delay', {
     count,
     [EXECUTION_LOG_START_TIME]: newTime,
     [EXECUTION_LOG_CALLER]: 'timer',
   });
 
+  logMemoryUsage('After processing request');
+
   res.send('Hi');
 });
 
-app.listen(1337, () => logger.debug(`Listening on port: 1337`));
+app.listen(1337, () => {
+  logger.debug('Listening on port: 1337');
+  logMemoryUsage('Initial memory usage');
+});
