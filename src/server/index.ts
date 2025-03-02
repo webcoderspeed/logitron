@@ -4,7 +4,8 @@ import readline from "readline";
 
 const app = express();
 const PORT = 1338;
-const logRegex = /\[(.*?)\] (\w+):(?: \[([a-f0-9-]+)\])?(.*)/;
+const logRegex = /\[(.*?)\] (\w+):(?:\[([a-f0-9-]+)\])?(.*)/;
+const timerRegex = /\[timer: ([0-9.]+s)\]:?/;
 
 interface LogEntry {
     id?: string;
@@ -33,15 +34,27 @@ export const startServer = (logFilePath: string) => {
             if (level && logLevel !== level.toLowerCase()) continue;
             if (traceId && parsedTraceId !== traceId) continue;
 
-            let data;
+            let data = null
+            let executionTime = null;
+
             try {
-                data = rawData ? JSON.parse(rawData.trim().replace(/^:\s*/, "")) : null;
+                executionTime = rawData?.match(timerRegex)?.[1];
+                data = rawData?.replace(timerRegex, "").replace(/^\s*:\s*/, "").trim();
+                data = data ? JSON.parse(data) : null;
             } catch {
-                data = rawData?.trim().replace(/^:\s*/, "");
+                data = rawData?.replace(timerRegex, "").replace(/^\s*:\s*/, "").trim();
             }
 
             if (total >= start && total < end) {
-                logs.push({ id: parsedTraceId && parsedTraceId.length > 0 ? parsedTraceId : undefined, timestamp: timestamp!, level: logLevel, data });
+                logs.push({
+                    id: parsedTraceId && parsedTraceId.length > 0 ? parsedTraceId : undefined,
+                    timestamp: timestamp!,
+                    level: logLevel,
+                    data,
+                    ...(executionTime && {
+                        executionTime
+                    })
+                });
             }
             total++;
         }
@@ -50,19 +63,20 @@ export const startServer = (logFilePath: string) => {
     }
 
     app.get("/logs", async (req, res) => {
-        let { filePath = "api.log", page = "1", limit = "10", level, traceId } = req.query;
+        let { page = "1", limit = "10", level, traceId } = req.query;
         const pageNumber = parseInt(page as string);
         const pageSize = parseInt(limit as string);
 
-        if (!fs.existsSync(filePath as string)) {
+        if (!fs.existsSync(logFilePath)) {
             return res.status(400).json({ error: "File not found" });
         }
 
-        const { total, data } = await parseLogFile( pageNumber, pageSize, level as string, traceId as string);
+        const { total, data } = await parseLogFile(pageNumber, pageSize, level as string, traceId as string);
         res.json({ total, page: pageNumber, limit: pageSize, data });
     });
 
     app.listen(PORT, () => {
         console.log(`Server running at http://localhost:${PORT}`);
     });
+
 }

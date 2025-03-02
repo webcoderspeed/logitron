@@ -7,7 +7,7 @@ import {
   format,
   LoggerService,
   traceMiddleware,
-  startServer,
+  startServer
 } from '../src';
 
 const { colorize, printf, combine, timestamp } = format;
@@ -31,7 +31,7 @@ const logger = new LoggerService({
         ),
       }),
       new transports.File({
-        filename: 'api.log',
+        filename: './logs/api.log',
       }),
     ],
     format: combine(
@@ -81,4 +81,4 @@ app.post('/', async (req, res) => {
 
 app.listen(1337, () => logger.info(`Listening on port: 1337`));
 
-startServer('api.log');
+startServer('./logs/api.log');
