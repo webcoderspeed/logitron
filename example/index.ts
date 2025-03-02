@@ -7,6 +7,7 @@ import {
   format,
   LoggerService,
   traceMiddleware,
+  startServer,
 } from '../src';
 
 const { colorize, printf, combine, timestamp } = format;
@@ -78,4 +79,6 @@ app.post('/', async (req, res) => {
   res.send('Hi');
 });
 
-app.listen(1337, () => logger.debug(`Listening on port: 1337`));
+app.listen(1337, () => logger.info(`Listening on port: 1337`));
+
+startServer('api.log');
