@@ -1,6 +1,7 @@
 import express from "express";
 import fs from "fs";
 import readline from "readline";
+import cors, { CorsOptions } from 'cors';
 
 const app = express();
 const PORT = 1338;
@@ -14,7 +15,15 @@ interface LogEntry {
     data: any;
 }
 
-export const startServer = (logFilePath: string) => {
+export const startServer = ({
+    logFilePath, corsOptions
+}: {
+    logFilePath: string;
+    corsOptions: CorsOptions
+}) => {
+
+    app.use(cors(corsOptions))
+
     async function parseLogFile(page: number, limit: number, level?: string, traceId?: string): Promise<{ total: number, data: LogEntry[] }> {
         const stream = fs.createReadStream(logFilePath, "utf-8");
         const rl = readline.createInterface({ input: stream, crlfDelay: Infinity });
@@ -62,7 +71,7 @@ export const startServer = (logFilePath: string) => {
         return { total, data: logs };
     }
 
-    app.get("/logs", async (req, res) => {
+    app.get("/api/logs", async (req, res) => {
         let { page = "1", limit = "10", level, traceId } = req.query;
         const pageNumber = parseInt(page as string);
         const pageSize = parseInt(limit as string);

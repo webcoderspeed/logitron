@@ -81,4 +81,10 @@ app.post('/', async (req, res) => {
 
 app.listen(1337, () => logger.info(`Listening on port: 1337`));
 
-startServer('./logs/api.log');
+startServer({
+  logFilePath: './logs/api.log',
+  corsOptions: {
+    methods: 'GET',
+    origin: 'http://127.0.0.1:5500'
+  }
+});

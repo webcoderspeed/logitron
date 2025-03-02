@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Viewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.5/dist/full.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="container mx-auto bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Log Viewer</h2>
+        <div class="flex gap-4 mb-4 flex-wrap md:flex-nowrap">
+            <select id="logLevel" class="select select-bordered w-full max-w-xs">
+                <option value="">All Levels</option>
+                <option value="info">Info</option>
+                <option value="warn">Warning</option>
+                <option value="error">Error</option>
+            </select>
+            <input type="text" id="searchText" placeholder="Search logs" class="input input-bordered w-full">
+            <input type="text" id="traceId" placeholder="Trace ID" class="input input-bordered w-full">
+            <button onclick="fetchLogs(1)" class="btn btn-primary">Search</button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="table w-full table-zebra">
+                <thead>
+                    <tr>
+                        <th>Trace Id</th>
+                        <th>Timestamp</th>
+                        <th>Level</th>
+                        <th>Data</th>
+                        <th>Execution Time</th>
+                    </tr>
+                </thead>
+                <tbody id="logsTable"></tbody>
+            </table>
+        </div>
+        <div class="flex justify-between items-center mt-4">
+            <button id="prevBtn" class="btn" onclick="prevPage()">Prev</button>
+            <span id="pageNumber">Page 1</span>
+            <button id="nextBtn" class="btn" onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let totalPages = 1;
+        const logsPerPage = 10;
+
+        async function fetchLogs(page) {
+            try {
+                const levelFilter = document.getElementById("logLevel").value;
+                const searchFilter = document.getElementById("searchText").value.toLowerCase();
+                const traceIdFilter = document.getElementById("traceId").value;
+                
+                let url = `http://localhost:1338/api/logs?page=${page}&limit=${logsPerPage}`;
+                if (levelFilter) url += `&level=${levelFilter}`;
+                if (traceIdFilter) url += `&traceId=${traceIdFilter}`;
+                
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                let logs = result.data;
+                totalPages = Math.ceil(result.total / logsPerPage);
+                currentPage = result.page;
+                
+                if (searchFilter) {
+                    logs = logs.filter(log => log.data.toLowerCase().includes(searchFilter));
+                }
+
+                displayLogs(logs);
+                updatePagination();
+            } catch (error) {
+                console.error("Error fetching logs:", error);
+            }
+        }
+
+        function displayLogs(logs) {
+            const logTable = document.getElementById("logsTable");
+            logTable.innerHTML = "";
+            logs.forEach(log => {
+                const row = `<tr>
+                    <td class="text-white">${log.id ?? 'N/A'}</td>
+                    <td>${new Date(log.timestamp).toLocaleString()}</td>
+                    <td class="font-bold text-${log.level === "error" ? "red" : "blue"}-700">${log.level.toUpperCase()}</td>
+                    <td class="w-96">${log.data}</td>
+                    <td>${log.executionTime || "-"}</td>
+                </tr>`;
+                logTable.innerHTML += row;
+            });
+        }
+
+        function updatePagination() {
+            document.getElementById("pageNumber").innerText = `Page ${currentPage}`;
+            document.getElementById("prevBtn").disabled = currentPage <= 1;
+            document.getElementById("nextBtn").disabled = currentPage >= totalPages;
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) fetchLogs(currentPage + 1);
+        }
+
+        function prevPage() {
+            if (currentPage > 1) fetchLogs(currentPage - 1);
+        }
+
+        window.onload = () => fetchLogs(1);
+    </script>
+</body>
+</html>
