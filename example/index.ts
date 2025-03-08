@@ -7,7 +7,8 @@ import {
   format,
   LoggerService,
   traceMiddleware,
-  startServer
+  startServer,
+  TraceIdHandler
 } from '../src';
 
 const { colorize, printf, combine, timestamp } = format;
@@ -66,7 +67,6 @@ app.post('/', async (req, res) => {
   count++;
 
   const newTime = new Date().getTime();
-  logger.info('Inside app route');
 
   await new Promise(res => setTimeout(res, 1500));
 
@@ -74,6 +74,7 @@ app.post('/', async (req, res) => {
     count,
     [EXECUTION_LOG_START_TIME]: newTime,
     [EXECUTION_LOG_CALLER]: 'timer',
+    traceId: TraceIdHandler.getTraceId()
   });
 
   res.send('Hi');
