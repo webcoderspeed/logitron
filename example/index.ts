@@ -27,9 +27,6 @@ const logger = new LoggerService({
 		transports: [
 			new transports.Console({
 				format: combine(
-					timestamp({
-						format: 'YYYY-MM-DDThh:mm:ss',
-					}),
 					colorize({ all: true }),
 					printf((info) => `${info.message}`),
 				),
@@ -39,9 +36,6 @@ const logger = new LoggerService({
 			}),
 		],
 		format: combine(
-			timestamp({
-				format: 'YYYY-MM-DDThh:mm:ss',
-			}),
 			printf((info) => `${info.message}`),
 		),
 	},
@@ -66,7 +60,7 @@ app.get('/', async (req, res) => {
 		},
 	);
 
-	res.send('Hi');
+res.send('Hello World');
 });
 
 app.post('/', async (req, res) => {

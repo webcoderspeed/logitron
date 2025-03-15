@@ -14,11 +14,12 @@ export class PinoService implements ILogger {
 		this.logger = pino({
 			transport: {
 				target: 'pino-pretty',
+				options: {
+					ignore: 'level'
+				}
 			},
-			base: {
-				pid: false,
-			},
-			timestamp: () => `,"time":"${format(new Date(), "yyyy-MM-dd'T'HH:mm:ss")}"`,
+			base: null,
+			timestamp: false,
 			...options,
 		});
 		this.appName = options?.appName ?? APP_NAME;
