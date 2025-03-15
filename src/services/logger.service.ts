@@ -1,30 +1,45 @@
+/** @format */
+
 import { ILogger, ILoggerOptions, LoggerType } from '../types';
 import { getLogger } from '../factory/';
 
 export class LoggerService implements ILogger {
-    private logger: ILogger;
+	private readonly logger: ILogger;
 
-    constructor(
-        options: ILoggerOptions = {
-            type: LoggerType.PINO,
-        },
-    ) {
-        this.logger = getLogger(options);
-    }
+	constructor(
+		options: ILoggerOptions = {
+			type: LoggerType.PINO,
+		},
+	) {
+		this.logger = getLogger(options);
+	}
 
-    info(...optionalParams: any[]): void {
-        this.logger.info(...optionalParams);
-    }
+	info(message: string, ...optionalParams: any[]): void {
+		this.logger.info(message, ...optionalParams);
+	}
 
-    warn(...optionalParams: any[]): void {
-        this.logger.warn(...optionalParams);
-    }
+	warn(message: string, ...optionalParams: any[]): void {
+		this.logger.warn(message, ...optionalParams);
+	}
 
-    error(...optionalParams: any[]): void {
-        this.logger.error(...optionalParams);
-    }
+	error(message: string, ...optionalParams: any[]): void {
+		this.logger.error(message, ...optionalParams);
+	}
 
-    debug(...optionalParams: any[]): void {
-        this.logger.debug(...optionalParams);
-    }
+	debug(message: string, ...optionalParams: any[]): void {
+		this.logger.debug(message, ...optionalParams);
+	}
+
+	infoWithExecutionTime(message: string, execution: { name: string; start: number }, ...optionalParams: any[]): void {
+		this.logger.infoWithExecutionTime(message, execution, ...optionalParams);
+	}
+	warnWithExecutionTime(message: string, execution: { name: string; start: number }, ...optionalParams: any[]): void {
+		this.logger.warnWithExecutionTime(message, execution, ...optionalParams);
+	}
+	errorWithExecutionTime(message: string, execution: { name: string; start: number }, ...optionalParams: any[]): void {
+		this.logger.errorWithExecutionTime(message, execution, ...optionalParams);
+	}
+	debugWithExecutionTime(message: string, execution: { name: string; start: number }, ...optionalParams: any[]): void {
+		this.logger.debugWithExecutionTime(message, execution, ...optionalParams);
+	}
 }
