@@ -21,6 +21,7 @@ export class WinstonService implements ILogger {
       ),
       ...options,
     });
+    this.appName = options?.appName ?? APP_NAME
   }
 
   info(message: string, ...optionalParams: any[]): void {

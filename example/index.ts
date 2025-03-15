@@ -20,6 +20,7 @@ app.use(traceMiddleware)
 const logger = new LoggerService({
   type: LoggerType.WINSTON,
   options: {
+    appName: 'test hub',
     level: 'debug',
     transports: [
       new transports.Console({
