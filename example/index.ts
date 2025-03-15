@@ -13,7 +13,7 @@ import {
 	TraceIdHandler,
 } from '../src';
 
-const { colorize, printf, combine, timestamp } = format;
+const { colorize, printf, combine } = format;
 
 const app = express();
 
