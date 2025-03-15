@@ -1,1 +1,3 @@
-export * from './logger.factory'
+/** @format */
+
+export * from './logger.factory';

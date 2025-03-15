@@ -20,7 +20,7 @@ app.use(traceMiddleware)
 const logger = new LoggerService({
   type: LoggerType.WINSTON,
   options: {
-    appName: 'test hub',
+    appName: 'test app',
     level: 'debug',
     transports: [
       new transports.Console({
@@ -51,11 +51,13 @@ app.get('/', async (req, res) => {
   count++;
 
   const newTime = new Date().getTime();
+  const start = performance.now();
+
   logger.info('Inside app route');
 
   await new Promise(res => setTimeout(res, 1500));
 
-  logger.info('Inside app route after 5s', {
+  logger.infoWithExecutionTime('Inside app route after 5s', { name: 'GET /', start: newTime } , {
     count,
     [EXECUTION_LOG_START_TIME]: newTime,
     [EXECUTION_LOG_CALLER]: 'timer',

@@ -1,1 +1,3 @@
-export * from "./trace.middleware";
+/** @format */
+
+export * from './trace.middleware';
