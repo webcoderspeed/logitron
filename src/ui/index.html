@@ -1,11 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Log Viewer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.5/dist/full.css" rel="stylesheet">
+    
+    <!-- Prism.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
 </head>
 <body class="bg-gray-100 p-6">
     <div class="container mx-auto bg-white shadow-lg rounded-lg p-6">
@@ -25,11 +26,12 @@
             <table class="table w-full table-zebra">
                 <thead>
                     <tr>
-                        <th>Trace Id</th>
                         <th>Timestamp</th>
                         <th>Level</th>
-                        <th>Data</th>
+                        <th>App Name</th>
+                        <th>Message</th>
                         <th>Execution Time</th>
+                        <th>Payload</th>
                     </tr>
                 </thead>
                 <tbody id="logsTable"></tbody>
@@ -65,7 +67,7 @@
                 currentPage = result.page;
                 
                 if (searchFilter) {
-                    logs = logs.filter(log => log.data.toLowerCase().includes(searchFilter));
+                    logs = logs.filter(log => log.message?.toLowerCase().includes(searchFilter));
                 }
 
                 displayLogs(logs);
@@ -79,15 +81,30 @@
             const logTable = document.getElementById("logsTable");
             logTable.innerHTML = "";
             logs.forEach(log => {
+                const payloadJson = log.payload ? JSON.stringify(log.payload, null, 2) : "N/A";
+
                 const row = `<tr>
-                    <td class="text-white">${log.id ?? 'N/A'}</td>
                     <td>${new Date(log.timestamp).toLocaleString()}</td>
                     <td class="font-bold text-${log.level === "error" ? "red" : "blue"}-700">${log.level.toUpperCase()}</td>
-                    <td class="w-96">${log.data}</td>
-                    <td>${log.executionTime || "-"}</td>
+                    <td>${log.appName || "N/A"}</td>
+                    <td class="w-96">${log.message || "N/A"}</td>
+                    <td>${log.execution || "-"}</td>
+                    <td class="w-96 max-w-xs overflow-x-auto bg-gray-900 text-white rounded p-2">
+                        <pre><code class="language-json">${escapeHtml(payloadJson)}</code></pre>
+                    </td>
                 </tr>`;
                 logTable.innerHTML += row;
             });
+
+            Prism.highlightAll();
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
         }
 
         function updatePagination() {
@@ -106,5 +123,8 @@
 
         window.onload = () => fetchLogs(1);
     </script>
+
+    <!-- Prism.js for JSON Syntax Highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
 </body>
-</html>

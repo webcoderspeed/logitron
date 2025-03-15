@@ -1,22 +1,24 @@
+import { time } from "console";
 import { LogEntry } from "../types";
 import fs from "fs";
 import readline from "readline";
 
-export async function parseLogFile({
-  logFilePath,
-  page,
-  limit,
-  logRegex,
-  level,
-  traceId,
-}: {
+type SearchParams = {
   logFilePath: string;
   page: number;
   limit: number;
+  logRegex: RegExp;
   level?: string;
   traceId?: string;
-  logRegex: RegExp;
-}): Promise<{ total: number; data: LogEntry[] }> {
+  appName?: string;
+  message?: string;
+  execution?: string;
+  searchPayload?: string;
+};
+
+export async function parseLogFile(params: SearchParams): Promise<{ total: number; data: LogEntry[] }> {
+  const { logFilePath, page, limit, logRegex, level, traceId, appName, message, execution, searchPayload } = params;
+
   if (!fs.existsSync(logFilePath)) {
     throw new Error("File not found");
   }
@@ -33,24 +35,28 @@ export async function parseLogFile({
     const match = line.match(logRegex);
     if (!match) continue;
 
-    const [, timestamp, logLevelRaw, appName, parsedTraceId, message, rawPayload, rawExecution] = match;
+    const [, timestamp, logLevelRaw, parsedAppName, parsedTraceId, parsedMessage, rawPayload, rawExecution] = match;
     const logLevel = logLevelRaw ? logLevelRaw.toLowerCase() : "unknown";
+
+    const payload = rawPayload && rawPayload !== "N/A" ? JSON.parse(rawPayload) : "";
+    const executionTime = rawExecution && rawExecution !== "N/A" ? rawExecution : "";
 
     if (level && logLevel !== level.toLowerCase()) continue;
     if (traceId && parsedTraceId !== traceId) continue;
-
-    const payload = rawPayload && rawPayload !== "N/A" ? JSON.parse(rawPayload) : "";
-    const execution = rawExecution && rawExecution !== "N/A" ? rawExecution : "";
+    if (appName && parsedAppName?.toLowerCase() !== appName.toLowerCase()) continue;
+    if (message && !parsedMessage?.toLowerCase().includes(message.toLowerCase())) continue;
+    if (execution && executionTime !== execution) continue;
+    if (searchPayload && rawPayload !== "N/A" && !JSON.stringify(payload).toLowerCase().includes(searchPayload.toLowerCase())) continue;
 
     if (total >= start && total < end) {
       logs.push({
         id: parsedTraceId && parsedTraceId.length > 0 ? parsedTraceId : "N/A",
         timestamp: timestamp!,
         level: logLevel,
-        appName: appName!,
-        message: message!,
+        appName: parsedAppName!,
+        message: parsedMessage!,
         payload,
-        execution,
+        execution: executionTime,
       });
     }
     total++;

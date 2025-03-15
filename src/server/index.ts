@@ -9,29 +9,42 @@ const PORT = 1338;
 const logRegex = /^\[(.*?)\] \[(.*?)\] \[(.*?)\] \[(.*?)\] \[(.*?)\] \[(.*?)\] \[(.*?)\]$/
 
 export const startServer = ({
-    logFilePath, corsOptions
+  logFilePath,
+  corsOptions,
 }: {
-    logFilePath: string;
-    corsOptions: CorsOptions
+  logFilePath: string;
+  corsOptions: CorsOptions;
 }) => {
+  app.use(cors(corsOptions));
 
-    app.use(cors(corsOptions))
+  app.get("/api/logs", async (req, res) => {
+    try {
+      let { page = "1", limit = "10", level, traceId, appName, message, execution, searchPayload } = req.query;
 
+      const pageNumber = parseInt(page as string, 10);
+      const pageSize = parseInt(limit as string, 10);
 
+      const { total, data } = await parseLogFile({
+        logFilePath,
+        logRegex,
+        page: pageNumber,
+        limit: pageSize,
+        level: level as string,
+        traceId: traceId as string,
+        appName: appName as string,
+        message: message as string,
+        execution: execution as string,
+        searchPayload: searchPayload as string,
+      });
 
-    app.get("/api/logs", async (req, res) => {
-        let { page = "1", limit = "10", level, traceId } = req.query;
-        const pageNumber = parseInt(page as string);
-        const pageSize = parseInt(limit as string);
+      res.json({ total, page: pageNumber, limit: pageSize, data });
+    } catch (error) {
+      console.error("Error fetching logs:", error);
+      res.status(500).json({ error: "Failed to fetch logs" });
+    }
+  });
 
-        const { total, data } = await parseLogFile({
-            limit: Number(limit), logFilePath, logRegex, page: Number(page), level: level as string, traceId: traceId as string,
-        });
-        res.json({ total, page: pageNumber, limit: pageSize, data });
-    });
-
-    app.listen(PORT, () => {
-        console.log(`Server running at http://localhost:${PORT}`);
-    });
-
-}
+  app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+  });
+};
