@@ -1,5 +1,5 @@
 {
-  "name": "logitron",
+  "name": "nodejs-logitron",
   "version": "1.0.0",
   "description": "Powerful logger module for Nodejs/ Nestjs, seamlessly integrating Pino and Winston for flexible logging with easy configuration.",
   "main": "lib/index.js",

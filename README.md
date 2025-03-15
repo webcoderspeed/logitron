@@ -1,9 +1,9 @@
-# Logitron
-[![npm version](https://img.shields.io/npm/v/logitron)](https://www.npmjs.com/package/logitron)
+# nodejs-logitron
+[![npm version](https://img.shields.io/npm/v/nodejs-logitron)](https://www.npmjs.com/package/nodejs-logitron)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://standardjs.com/)
 [![TypeScript definitions on DefinitelyTyped](https://img.shields.io/badge/DefinitelyTyped-.d.ts-brightgreen.svg?style=flat)](https://definitelytyped.org)
 
-Logitron is a powerful logging library built on top of **Winston** and **Pino**, providing structured logging with **trace ID injection per request**. It simplifies debugging in distributed systems by ensuring each log is uniquely traceable without memory leaks or async task issues.
+nodejs-logitron is a powerful logging library built on top of **Winston** and **Pino**, providing structured logging with **trace ID injection per request**. It simplifies debugging in distributed systems by ensuring each log is uniquely traceable without memory leaks or async task issues.
 
 ## Features
 - **Trace ID injection** for each request, making debugging seamless.
@@ -18,10 +18,10 @@ Logitron is a powerful logging library built on top of **Winston** and **Pino**,
 
 ## Installation
 
-Install `logitron` using npm:
+Install `nodejs-logitron` using npm:
 
 ```sh
-npm install logitron
+npm install nodejs-logitron
 ```
 
 ---
@@ -37,7 +37,7 @@ import {
     LoggerService,
     traceMiddleware,
     TraceIdHandler
-} from 'logitron';
+} from 'nodejs-logitron';
 
 const { colorize, printf, combine } = format;
 const app = express();
@@ -100,23 +100,11 @@ We use Node.js `async_hooks` to maintain a **continuation-local storage (CLS)** 
 - The trace ID is stored in this **context**, ensuring that every log from that request **carries the correct trace ID**.
 - Even in async tasks (setTimeout, database calls, etc.), the trace ID is **automatically retained**.
 
-Example Implementation:
-
-```ts
-import { AsyncLocalStorage } from 'async_hooks';
-
-export const asyncLocalStorage = new AsyncLocalStorage<{ traceId: string }>();
-
-export function withTraceId(traceId: string, fn: () => void) {
-	asyncLocalStorage.run({ traceId }, fn);
-}
-```
-
 ### Express Middleware for Automatic Trace ID Injection
 ```ts
 import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { withTraceId, TraceIdHandler } from 'logitron';
+import { withTraceId, TraceIdHandler } from 'nodejs-logitron';
 
 export function traceMiddleware(req: Request, _: Response, next: NextFunction) {
     const traceId =
@@ -149,7 +137,7 @@ Example Logs:
 ---
 
 ## Contribution
-Logitron is an **open-source project** designed to make logging simple and efficient for developers. We welcome contributions from the community to improve and enhance the library.
+nodejs-logitron is an **open-source project** designed to make logging simple and efficient for developers. We welcome contributions from the community to improve and enhance the library.
 
 ### How to Contribute
 - Fork the repository

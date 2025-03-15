@@ -8,5 +8,11 @@ export default defineConfig({
   clean: true,
   dts: true,
   outDir: 'lib',
-  minify: true
+  minify: true,
+  esbuildOptions(options) {
+    options.loader = {
+      '.html': 'copy', 
+    };
+    options.assetNames = '[name]'; 
+  },
 });
