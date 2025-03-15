@@ -28,7 +28,7 @@ const logger = new LoggerService({
             format: 'YYYY-MM-DDThh:mm:ss',
           }),
           colorize({ all: true }),
-          printf((info) => `[${info.timestamp}] ${info.level}:${info.message}`),
+          printf((info) => `${info.message}`),
         ),
       }),
       new transports.File({
@@ -39,7 +39,7 @@ const logger = new LoggerService({
       timestamp({
         format: 'YYYY-MM-DDThh:mm:ss',
       }),
-      printf((info) => `[${info.timestamp}] ${info.level}:${info.message}`),
+      printf((info) => `${info.message}`),
     ),
   },
 });

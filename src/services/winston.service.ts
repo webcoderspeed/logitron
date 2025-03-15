@@ -1,11 +1,13 @@
-import { createLogger, transports, format } from 'winston';
+import { createLogger, transports, format, Logger } from 'winston';
 import { ILogger, ILoggerOptions } from '../types';
 import formatLogMessage from '../utils/format-message.util';
+import { APP_NAME } from '../constants';
 
 const { combine, timestamp, printf, colorize } = format;
 
 export class WinstonService implements ILogger {
-  private readonly logger;
+    private readonly logger: Logger;
+    private readonly appName: string = APP_NAME
 
   constructor(options: ILoggerOptions['options']) {
     this.logger = createLogger({
@@ -21,23 +23,44 @@ export class WinstonService implements ILogger {
     });
   }
 
-  info(...optionalParams: any[]): void {
-    const formatedMessage = formatLogMessage(...optionalParams);
+  info(message: string, ...optionalParams: any[]): void {
+    const formatedMessage = formatLogMessage(
+      'info',
+      this.appName,
+      message, undefined,
+      ...optionalParams
+    );
+
     this.logger.info(formatedMessage);
   }
 
-  warn(...optionalParams: any[]): void {
-    const formatedMessage = formatLogMessage(...optionalParams);
+  warn(message: string, ...optionalParams: any[]): void {
+    const formatedMessage = formatLogMessage(
+      'warn',
+      this.appName,
+      message, undefined,
+      ...optionalParams
+    );
     this.logger.warn(formatedMessage);
   }
 
-  error(...optionalParams: any[]): void {
-    const formatedMessage = formatLogMessage(...optionalParams);
+  error(message: string, ...optionalParams: any[]): void {
+    const formatedMessage = formatLogMessage(
+      'error',
+      this.appName,
+      message, undefined,
+      ...optionalParams
+    );
     this.logger.error(formatedMessage);
   }
 
-  debug(...optionalParams: any[]): void {
-    const formatedMessage = formatLogMessage(...optionalParams);
+  debug(message: string, ...optionalParams: any[]): void {
+    const formatedMessage = formatLogMessage(
+      'debug',
+      this.appName,
+      message, undefined,
+      ...optionalParams
+    );
     this.logger.debug(formatedMessage);
   }
 }

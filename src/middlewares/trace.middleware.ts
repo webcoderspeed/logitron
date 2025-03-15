@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { v4 as uuidv4 } from 'uuid';
-import { asyncLocalStorage, TraceIdHandler, withTraceId } from "../utils";
+import { TraceIdHandler, withTraceId } from "../utils";
 
 export function traceMiddleware(
   req: Request,

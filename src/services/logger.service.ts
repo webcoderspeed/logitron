@@ -2,7 +2,7 @@ import { ILogger, ILoggerOptions, LoggerType } from '../types';
 import { getLogger } from '../factory/';
 
 export class LoggerService implements ILogger {
-    private logger: ILogger;
+    private readonly logger: ILogger;
 
     constructor(
         options: ILoggerOptions = {
@@ -11,20 +11,25 @@ export class LoggerService implements ILogger {
     ) {
         this.logger = getLogger(options);
     }
+    info(message: string, ...optionalParams: any[]): void {
+        this.logger.info(message, ...optionalParams)
+    }
+    
+    warn(message: string, ...optionalParams: any[]): void {
+                this.logger.warn(message, ...optionalParams)
 
-    info(...optionalParams: any[]): void {
-        this.logger.info(...optionalParams);
     }
 
-    warn(...optionalParams: any[]): void {
-        this.logger.warn(...optionalParams);
+    error(message: string, ...optionalParams: any[]): void {
+                this.logger.error(message, ...optionalParams)
+
     }
 
-    error(...optionalParams: any[]): void {
-        this.logger.error(...optionalParams);
+    debug(message: string, ...optionalParams: any[]): void {
+                this.logger.debug(message, ...optionalParams)
+
     }
 
-    debug(...optionalParams: any[]): void {
-        this.logger.debug(...optionalParams);
-    }
+
+    
 }

@@ -1,5 +1,5 @@
 import { TRACE_ID } from "../constants";
-import { asyncLocalStorage } from "./async_storage.util";
+import { asyncLocalStorage } from "./async-storage.util";
 
 export class TraceIdHandler {
   private static traceIdField: string = TRACE_ID;

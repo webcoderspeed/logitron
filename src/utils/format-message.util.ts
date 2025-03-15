@@ -1,45 +1,28 @@
-import { EXECUTION_LOG_CALLER, EXECUTION_LOG_START_TIME } from "../constants";
-import { asyncLocalStorage } from "./async_storage.util";
+import { LogLevel } from "../types";
+import { asyncLocalStorage } from "./async-storage.util";
 
-function formatLogMessage(...optionalParams: any[]): string {
-  const traceId = asyncLocalStorage.getStore()?.traceId ?? null;
+function formatLogMessage(
+  logLevel: LogLevel,
+  appName: string,
+  message: string,
+  execution?: { name?: string; time?: number },
+  ...optionalParams: any[]
+): string {
+  const timestamp = new Date().toISOString();
+  const traceId = asyncLocalStorage.getStore()?.traceId ?? "N/A";
 
-  let executionTime: number | null = null;
-  let executionCallerName: string | null = null;
-  const restData: string[] = [];
+  const payload = optionalParams.find(param => param && typeof param === "object") ?? null;
 
-  for (const item of optionalParams) {
-    if (!item) continue; // Skip falsy values directly
+  console.log({optionalParams})
 
-    if (typeof item === "object") {
-      if (EXECUTION_LOG_START_TIME in item) {
-        executionTime = (Date.now() - Number(item[EXECUTION_LOG_START_TIME] || 0)) / 1000;
-        delete item[EXECUTION_LOG_START_TIME];
-      }
-      if (EXECUTION_LOG_CALLER in item) {
-        executionCallerName = item[EXECUTION_LOG_CALLER];
-        delete item[EXECUTION_LOG_CALLER];
-      }
+  const executionInfo =
+    execution?.name && typeof execution?.time === "number"
+      ? `${execution.name} ${execution.time}ms`
+      : "N/A";
 
-      // Add to restData only if object still has properties
-      if (Object.keys(item).length) {
-        restData.push(JSON.stringify(item));
-      }
-    } else {
-      restData.push(String(item)); // Ensure all values are strings
-    }
-  }
-
-  // Construct log message efficiently
-  let logMessage = restData.join(" ");
-  if (executionTime !== null) {
-    logMessage = `[${executionCallerName ? executionCallerName + ":" : ""}${executionTime}s]:${logMessage}`;
-  }
-  if (traceId) {
-    logMessage = `[${traceId}]:${logMessage}`;
-  }
-
-  return logMessage;
+  return `[${timestamp}] [${logLevel.toUpperCase()}] [${appName.toUpperCase()}] [${traceId}] [${message}] [${
+    payload ? JSON.stringify(payload) : "N/A"
+  }] [${executionInfo}]`;
 }
 
 export default formatLogMessage;
