@@ -8,19 +8,24 @@ export interface ILogger {
   debug(optionalParams?: any[]): void;
 }
 
+
 export enum LoggerType {
   WINSTON = 'winston',
   PINO = 'pino',
 }
 
+type IExtraOptions = {
+  appName?: string
+}
+
 type IPinoOptions = {
   type?: LoggerType.PINO;
-  options?: PinoLoggerOptions | DestinationStream;
+  options?: (PinoLoggerOptions | DestinationStream) & IExtraOptions;
 };
 
 type IWinstonOptions = {
   type?: LoggerType.WINSTON;
-  options?: WinstonLoggerOptions;
+  options?: WinstonLoggerOptions & IExtraOptions;
 };
 
 export type ILoggerOptions = IPinoOptions | IWinstonOptions;

@@ -2,14 +2,14 @@ import { TRACE_ID } from "../constants";
 import { asyncLocalStorage } from "./async_storage.util";
 
 export class TraceIdHandler {
-  private static traceId: string = TRACE_ID;
+  private static traceIdField: string = TRACE_ID;
 
   static getTraceIdField(): string {
-    return TraceIdHandler.traceId;
+    return TraceIdHandler.traceIdField;
   }
 
-  static setTraceId(traceId: string): void {
-    TraceIdHandler.traceId = traceId;
+  static setTraceIdField(traceIdField: string): void {
+    TraceIdHandler.traceIdField = traceIdField;
   }
 
   static getTraceId() {

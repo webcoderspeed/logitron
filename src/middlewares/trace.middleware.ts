@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { v4 as uuidv4 } from 'uuid';
-import { asyncLocalStorage, TraceIdHandler } from "../utils";
+import { asyncLocalStorage, TraceIdHandler, withTraceId } from "../utils";
 
 export function traceMiddleware(
   req: Request,
@@ -12,5 +12,8 @@ export function traceMiddleware(
     (req?.body?.[TraceIdHandler.getTraceIdField()] as string) ??
     (req?.query?.[TraceIdHandler.getTraceIdField()] as string) ??
     uuidv4();
-  asyncLocalStorage.run({ traceId }, () => next());
+
+  withTraceId(
+    traceId, () => next()
+  )
 }
