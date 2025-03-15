@@ -69,5 +69,6 @@ export async function parseLogFile(params: SearchParams): Promise<{ total: numbe
 		total++;
 	}
 
-	return { total, data: logs };
+
+	return { total, data: logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())};
 }

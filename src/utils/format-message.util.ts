@@ -16,7 +16,7 @@ function formatLogMessage(
 	const payload = optionalParams.find((param) => param && typeof param === 'object') ?? null;
 
 	const executionInfo =
-		execution?.name && typeof execution?.time === 'number' ? `${execution.name} ${execution.time}ms` : 'N/A';
+		execution?.name && typeof execution?.time === 'number' ? `${execution.name} ${execution.time} ms` : 'N/A';
 
 	return `[${timestamp}] [${logLevel.toUpperCase()}] [${appName.toUpperCase()}] [${traceId}] [${message}] [${
 		payload ? JSON.stringify(payload) : 'N/A'
