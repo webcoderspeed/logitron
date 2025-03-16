@@ -15,12 +15,12 @@ function formatLogMessage(
 
 	const payload = optionalParams.find((param) => param && typeof param === 'object') ?? null;
 
-	const executionInfo =
-		execution?.name && typeof execution?.time === 'number' ? `${execution.name} ${execution.time} ms` : 'N/A';
-
+	const executionName = execution?.name ?? 'N/A';
+	const executionTime = typeof execution?.time === 'number' ? `${execution.time} ms` : 'N/A';
+	
 	return `[${timestamp}] [${logLevel.toUpperCase()}] [${appName.toUpperCase()}] [${traceId}] [${message}] [${
-		payload ? JSON.stringify(payload) : 'N/A'
-	}] [${executionInfo}]`;
+	  payload ? JSON.stringify(payload) : 'N/A'
+	}] [${executionName}] [${executionTime}]`;
 }
 
 export default formatLogMessage;

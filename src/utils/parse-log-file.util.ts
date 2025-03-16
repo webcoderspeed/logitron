@@ -1,6 +1,5 @@
 /** @format */
 
-import { time } from 'console';
 import { LogEntry } from '../types';
 import fs from 'fs';
 import readline from 'readline';
@@ -19,7 +18,18 @@ type SearchParams = {
 };
 
 export async function parseLogFile(params: SearchParams): Promise<{ total: number; data: LogEntry[] }> {
-	const { logFilePath, page, limit, logRegex, level, traceId, appName, message, execution, searchPayload } = params;
+	const {
+		logFilePath,
+		page,
+		limit,
+		logRegex = /^\[(.*?)\] \[(.*?)\] \[(.*?)\] \[(.*?)\] \[(.*?)\] \[(.*?)\] \[(.*?)\] \[(.*?)\]$/,
+		level,
+		traceId,
+		appName,
+		message,
+		execution,
+		searchPayload,
+	} = params;
 
 	if (!fs.existsSync(logFilePath)) {
 		throw new Error('File not found');
@@ -69,6 +79,5 @@ export async function parseLogFile(params: SearchParams): Promise<{ total: numbe
 		total++;
 	}
 
-
-	return { total, data: logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())};
+	return { total, data: (logs ?? [])?.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()) };
 }
