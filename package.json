@@ -1,6 +1,6 @@
 {
   "name": "nodejs-logitron",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Powerful logger module for Nodejs/ Nestjs, seamlessly integrating Pino and Winston for flexible logging with easy configuration.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -39,5 +39,27 @@
     "tsup": "^8.4.0",
     "tsx": "^4.19.3",
     "typescript": "^5.4.5"
-  }
+  },
+  "keywords": [
+    "logitron",
+    "logger",
+    "logging",
+    "trace-id",
+    "async-hooks",
+    "winston",
+    "pino",
+    "log",
+    "structured-logging",
+    "express-logger",
+    "nodejs",
+    "typescript",
+    "debugging",
+    "distributed-tracing",
+    "performance-monitoring",
+    "log-management",
+    "error-tracking",
+    "observability",
+    "request-logging",
+    "logging-middleware"
+  ]
 }
